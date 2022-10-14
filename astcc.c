@@ -155,7 +155,7 @@ static void ami_callback(struct ami_event *event)
 #ifdef DEVICE_NAME_ONLY
 	strncpy(device_name, channel, sizeof(device_name));
 	device_name[sizeof(device_name) - 1] = '\0'; /* On the off chance we filled the entire buffer, always null terminate */
-	tmp = strrchr(device_name, '/'); /* Find the LAST slash in the channel name. While not 100% accurate, 99.99% of the time, this is the end of the device name. */
+	tmp = strrchr(device_name, '-'); /* See ast_channel_name_to_dial_string in Asterisk */
 	if (!tmp) {
 		fprintf(stderr, "Invalid device name: %s\n", device_name);
 		goto cleanup;
