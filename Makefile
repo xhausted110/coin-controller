@@ -12,7 +12,7 @@ EXE		= astcc
 LIBS	= -lm
 RM		= rm -f
 
-MAIN_OBJ := cami.o astcc.o
+MAIN_OBJ := astcc.o
 
 all : main
 
@@ -20,10 +20,10 @@ all : main
 	$(CC) $(CFLAGS) -c $^
 
 main : $(MAIN_OBJ)
-	$(CC) $(CFLAGS) -o $(EXE) $(LIBS) *.o -ldl
+	$(CC) $(CFLAGS) -o $(EXE) $(LIBS) *.o -ldl -lcami
 
 clean :
-	$(RM) *.i *.o
+	$(RM) *.i *.o $(EXE)
 
 .PHONY: all
 .PHONY: main

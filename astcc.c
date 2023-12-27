@@ -70,8 +70,8 @@
 #include <errno.h>
 #include <assert.h>
 
-#include "include/cami.h"
-#include "include/cami_actions.h"
+#include <cami/cami.h>
+#include <cami/cami_actions.h>
 
 /*! \brief Use device names rather than full channel names for operations. Comment this out if you don't want this. */
 #define DEVICE_NAME_ONLY
@@ -122,7 +122,7 @@ static int operator_ringback(const char *channel)
 }
 
 /*! \brief Callback function executing asynchronously when new events are available */
-static void ami_callback(struct ami_event *event)
+static void ami_callback(struct ami_session *ami, struct ami_event *event)
 {
 	int res = 0;
 	const char *disp, *channel, *eventname = ami_keyvalue(event, "Event");
@@ -131,6 +131,8 @@ static void ami_callback(struct ami_event *event)
 	char *tmp;
 	char device_name[64];
 #endif
+
+	(void) ami;
 
 	if (strcmp(eventname, "CoinDisposition")) {
 		goto cleanup; /* Don't care about anything else. */
@@ -187,9 +189,10 @@ cleanup:
 	ami_event_free(event); /* Free event when done with it */
 }
 
-static void simple_disconnect_callback(void)
+static void simple_disconnect_callback(struct ami_session *ami)
 {
 	/* Start with a newline, since we don't know where we were. */
+	(void) ami;
 	fprintf(stderr, "\nAMI was forcibly disconnected...\n");
 	exit(EXIT_FAILURE); /* This will kill the program. */
 }
@@ -211,6 +214,7 @@ int main(int argc,char *argv[])
 	char ami_host[92] = "127.0.0.1"; /* Default to localhost */
 	char ami_username[64] = "";
 	char ami_password[64] = "";
+	struct ami_session *ami;
 
 	while ((c = getopt(argc, argv, getopt_settings)) != -1) {
 		switch (c) {
@@ -249,10 +253,11 @@ int main(int argc,char *argv[])
 		return -1;
 	}
 
-	if (ami_connect(ami_host, 0, ami_callback, simple_disconnect_callback)) {
+	ami = ami_connect(ami_host, 0, ami_callback, simple_disconnect_callback);
+	if (!ami) {
 		return -1;
 	}
-	if (ami_action_login(ami_username, ami_password)) {
+	if (ami_action_login(ami, ami_username, ami_password)) {
 		fprintf(stderr, "Failed to log in with username %s\n", ami_username);
 		return -1;
 	}
@@ -262,5 +267,7 @@ int main(int argc,char *argv[])
 		usleep(60000000);
 	}
 
+	ami_disconnect(ami);
+	ami_destroy(ami);
 	return 0;
 }
