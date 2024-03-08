@@ -89,28 +89,32 @@
 /*! \brief -130 volt coin return */
 static int coin_return(const char *channel)
 {
-	/*! \todo Coin return */
+	system("/bin/bash /scripts/payphone/return.sh");
 	return 0;
 }
 
 /*! \brief +130 volt coin collect */
 static int coin_collect(const char *channel)
 {
-	/*! \todo Coin collect */
+	system("/bin/bash /scripts/payphone/collect.sh");
 	return 0;
 }
 
-/*! \brief Enable DTMF keypad (negative battery) */
+/*! \brief Enable DTMF keypad (negative battery) 
+ * In a 1C set, this also puts the totalizer in local mode.
+ * In local mode, coin tones will not be sent until the initial rate is satisfied */
 static int operator_released(const char *channel)
 {
-	/*! \todo Operator released */
+	system("/bin/bash /scripts/payphone/operator-detatched.sh");
 	return 0;
 }
 
-/*! \brief Disable DTMF keypad (positive battery) */
+/*! \brief Disable DTMF keypad (positive battery) 
+ * In a 1C set, this also puts the totalizer in long distance mode.
+ * In long distance mode, coin tones will always be sent*/
 static int operator_attached(const char *channel)
 {
-	/*! \todo Operator attached */
+	system("/bin/bash /scripts/payphone/operator-attached.sh");
 	return 0;
 }
 
